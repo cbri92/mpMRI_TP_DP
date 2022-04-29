@@ -59,16 +59,26 @@ def rename_img_files(subj_dir, subj_name):
     
     '''Renames all .nii images to sensible names including subj_name and scan type'''
     
+    # for filename in glob.glob(subj_dir +'/' +'*.nii'):
+    #     if "mprage" in filename:
+    #         os.rename(filename, subj_dir +'/'+ subj_name +'_T1CE.nii')
+    #     elif "FET_PET" in filename:
+    #         os.rename(filename, subj_dir +'/'+ subj_name +'_PET_FET_raw.nii')
+    #     elif "FET_CT" in filename:
+    #         os.rename(filename, subj_dir +'/'+ subj_name +'_CT_FET.nii')
+    #     elif "PSMA_PET" in filename:
+    #         os.rename(filename, subj_dir +'/'+ subj_name +'_PET_TER_raw.nii')
+    #     elif "PSMA_CT" in filename:
+    #         os.rename(filename, subj_dir +'/'+ subj_name +'_CT_TER.nii')
+    
     for filename in glob.glob(subj_dir +'/' +'*.nii'):
-        if "mprage" in filename:
-            os.rename(filename, subj_dir +'/'+ subj_name +'_T1CE.nii')
-        elif "FET_PET" in filename:
+        if "FET PET Brain" in filename:
             os.rename(filename, subj_dir +'/'+ subj_name +'_PET_FET_raw.nii')
-        elif "FET_CT" in filename:
+        elif "FET Fused CT" in filename:
             os.rename(filename, subj_dir +'/'+ subj_name +'_CT_FET.nii')
-        elif "PSMA_PET" in filename:
+        elif "PSMA PET" in filename:
             os.rename(filename, subj_dir +'/'+ subj_name +'_PET_TER_raw.nii')
-        elif "PSMA_CT" in filename:
+        elif "PSMA Fused CT" in filename:
             os.rename(filename, subj_dir +'/'+ subj_name +'_CT_TER.nii')
 
 
@@ -361,6 +371,11 @@ def generate_thresholded_roi(mask, low_thr, high_thr):
     thr_roi = sitk.Cast(thr_roi, sitk.sitkUInt16)
     return thr_roi  
     
+def set_mask_value(image, mask, value):
+    msk32 = sitk.Cast(mask, sitk.sitkFloat32)
+    return sitk.Cast(sitk.Cast(image, sitk.sitkFloat32) *
+                     sitk.InvertIntensity(msk32, maximum=1.0) + 
+                     msk32*value, image.GetPixelID())
 
 #%% Generate smoothed image by applying a Gaussian smooth image filter
 
@@ -492,6 +507,15 @@ def getMaxRoi(roi, image):
     stats.Execute(roi, image)
     maxVal = stats.GetMaximum(1)
     return maxVal
+
+def getMeanRoi(roi, image):
+    
+    '''Calculates mean intensity value from the roi applied on the image and returns it as a float'''
+    
+    stats = sitk.LabelIntensityStatisticsImageFilter()
+    stats.Execute(roi, image)
+    meanVal = stats.GetMean(1)
+    return meanVal
 
 def TBR(dictionary_stats_roi_on_image, dictionary_stats_ctrl_roi_on_image):
     
@@ -674,3 +698,114 @@ def affine_translate(image, dimension, x_translation=0.0, y_translation=0.0, z_t
     new_transform.SetTranslation((x_translation, y_translation, z_translation))
     resampled = resample(image, new_transform)
     return resampled
+
+def set_mask_value(image, mask, value):    
+    '''This function set the intensity of every voxel of the image within the specified mask to a set value.'''
+    msk32 = sitk.Cast(mask, sitk.sitkFloat32)
+    return sitk.Cast(sitk.Cast(image, sitk.sitkFloat32) *
+                     sitk.InvertIntensity(msk32, maximum=1.0) + 
+                     msk32*value, image.GetPixelID())
+
+def point2str(point, precision=1):
+    """
+    Format a point for printing, based on specified precision with trailing zeros. Uniform printing for vector-like data 
+    (tuple, numpy array, list).
+    
+    Args:
+        point (vector-like): nD point with floating point coordinates.
+        precision (int): Number of digits after the decimal point.
+    Return:
+        String represntation of the given point "xx.xxx yy.yyy zz.zzz...".
+    """
+    return ' '.join(format(c, '.{0}f'.format(precision)) for c in point)
+
+# def translate_point(point, translation_vector):
+#     '''Translate a point in 3D space given a point as a tuple of x, y, z cooridnates and a translation_vector as a tuple.
+#     Returns the translated point coordinates as a tuple'''
+#     dimension = 3        
+#     offset = translation_vector # offset can be any vector-like data  
+#     translation = sitk.TranslationTransform(dimension, offset)
+#     transformed_point = (translation.TransformPoint(point))
+#     return transformed_point
+
+# def rotation3d_point(point, image, theta, x=0, y=0, z=0):
+#     """
+#     This function rotates a point in 3D with rotation around x, y, z axis of theta angle as a versor around a fixed center defined by the image.
+#     :return: The rotated point
+#     """
+#     # theta = np.deg2rad(theta)   
+#     image_center = (image.GetSize()[0]/2, image.GetSize()[1]/2, image.GetSize()[2]/2)
+#     rotation = sitk.VersorTransform([x,y,z,theta], image_center)
+#     rotated_point=(rotation.TransformPoint(point))
+#     point2=(round(rotated_point[0]), round(rotated_point[1]), round(rotated_point[2]))
+#     return point2
+
+def translate_point(point, dimension, x_translation=0.0, y_translation=0.0, z_translation=0.0):
+    '''Translate a point in 3D space given a point as a tuple of x, y, z cooridnates and a translation_vector as a tuple.
+    Returns the translated point coordinates as a tuple'''
+         
+    t =(x_translation,y_translation,z_translation) 
+    translation = sitk.TranslationTransform(dimension, t)
+
+    # Only need to copy the translational component.
+    rigid_euler = sitk.Euler3DTransform()
+    rigid_euler.SetTranslation(translation.GetOffset())
+    translated_point = (rigid_euler.TransformPoint(point))
+    # new_transform = sitk.AffineTransform(dimension)
+    # new_transform.SetTranslation((x_translation, y_translation, z_translation))
+    # translated_point = (new_transform.TransformPoint(point))
+    return translated_point
+
+
+def rotation3d_point(point, image, theta_z):
+    """
+    This function rotates a point in 3D with rotation around x, y, z axis of theta angle as a versor around a fixed center defined by the image.
+    :return: The rotated point
+    """
+    # theta = np.deg2rad(theta)   
+    theta_z = np.deg2rad(theta_z)
+    euler_transform = sitk.Euler3DTransform()
+    print(euler_transform.GetMatrix())
+    image_center = get_center(image)
+    euler_transform.SetCenter(image_center)
+
+    direction = image.GetDirection()
+    axis_angle = (direction[2], direction[5], direction[8], theta_z)
+    np_rot_mat = matrix_from_axis_angle(axis_angle)
+    euler_transform.SetMatrix(np_rot_mat.flatten().tolist())
+    rotated_point = (euler_transform.TransformPoint(point))
+    point2=(round(rotated_point[0]), round(rotated_point[1]), round(rotated_point[2]))
+    return point2
+
+#%%Radiotherapy dose painting analysis functions
+
+def reassign_voxel_intensity(image, mask, low_thr, high_thr, new_value):
+        
+    '''This function set the intensity of all the voxels belonging to the mask with original intensity within the low_thr and high_thr to the new_value'''
+    masked_img = generate_mask(image, mask)
+    mask0 =  generate_thresholded_roi(masked_img, low_thr, high_thr)
+    masked_img = set_mask_value(masked_img, mask0, new_value)
+    masked_img = generate_mask(masked_img, mask)
+    return masked_img
+
+
+def calculate_tcp(weighted_dose, alpha, C, tumour_presence_prob=None):
+    
+    '''This function returns the tumour control probability in a region of interest, from the dose prescription and the voxel-wise probability of tumour presence.
+    C is a constrant (determined from radiobiological parameters) and alpha is a radiobiological parameter.'''
+    
+    if tumour_presence_prob is None:
+        # default assumption is that there is tumour everywhere
+        tumour_presence_prob = np.ones(weighted_dose.shape)
+
+    ln_tcp = C * np.sum(tumour_presence_prob * np.exp(-alpha * weighted_dose))
+    tcp = np.exp(-1*ln_tcp)
+    return tcp
+
+def generate_QF_map(Prescribed_dose_image, Planned_dose_image, roi):
+    '''This function generates Quality Factor images between the planned and the prescribed dose within a roi. The closer QF is to 100, the better the quality of the plan wrt to the dose prescription.'''
+    
+    Rel_dose = abs((Planned_dose_image-Prescribed_dose_image)/Prescribed_dose_image)
+    QF_img = 100 - Rel_dose*100
+    QF_img = generate_mask(QF_img, roi)
+    return QF_img
