@@ -327,7 +327,7 @@ for current in subjs_name:
 #%% Generate tumour probability map only within GTV-CTV margins
 
     GTV = sitk.ReadImage(rel_imgs +'/GTV.nii') #read GTV   
-    CTV = sitk.ReadImage(rel_imgs +'/CTV.nii')
+    CTV = sitk.ReadImage(rel_imgs +'/CTV.nii') #read CTV
     Margin_volume=CTV-GTV
     Margin_volume=generate_mask(Margin_volume, brain_mask)
     sitk.WriteImage(Margin_volume, rel_imgs+'/Margin_volume.nii')
@@ -361,6 +361,7 @@ for current in subjs_name:
     sitk.WriteImage(Inv_ADC_rBF_DPBN, dose_imgs +'/Inv_ADC_rBF_DPBN.nii')
     
     # #Generate mask of inverse dose in PTV
+    PTV = sitk.ReadImage(rel_imgs +'/PTV.nii') #read PTV
     Inv_ADC_rBV_DPBN_inGTV = generate_mask(Inv_ADC_rBV_DPBN, PTV)
     Inv_ADC_rBF_DPBN_inGTV = generate_mask(Inv_ADC_rBF_DPBN, PTV)
     
