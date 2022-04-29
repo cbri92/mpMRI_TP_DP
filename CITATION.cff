@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-- family-names: "BRIGHI"
-  given-names: "CATERINA"
+- family-names: "Brighi"
+  given-names: "Caterina"
   orcid: "https://orcid.org/0000-0001-9407-5772"
 title: "mpMRI_TP_DP"
 version: 1.0.0
