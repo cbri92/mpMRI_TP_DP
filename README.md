@@ -27,3 +27,6 @@ The main project file of this repository, containing a pipeline to use functiona
 
 **Directory Structure** 
 NA
+
+**Citation**
+If you use code from this repository, please cite [![DOI](https://zenodo.org/badge/380894935.svg)](https://zenodo.org/badge/latestdoi/380894935)
