@@ -19,7 +19,7 @@ from platipy.dicom.nifti_to_series.convert import convert_nifti_to_dicom_series
 
 #%% Set Working directory
         
-data_supradir = 'C:/Users/cbri3325/Dropbox (Sydney Uni)/Caterina Brighi/Data/test/' #Set working directory
+data_supradir = 'path to supradirectory containing individual patients directories' #Set working directory
 
 subjs_path = [ f.path for f in os.scandir(data_supradir) if f.is_dir() ] #Create a list of the paths to the subjects directories
 subjs_name = [ f.name for f in os.scandir(data_supradir) if f.is_dir() ] #Create a list of subjects names
