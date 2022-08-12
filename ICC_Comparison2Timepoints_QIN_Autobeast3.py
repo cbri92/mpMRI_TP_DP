@@ -2,7 +2,12 @@
 """
 Created on Mon Jan 11 14:52:43 2021
 
-@author: cbri3325
+@author: Caterina Brighi
+
+This script calculates ICC (2,1) in a ROI between images acquired at two timepoints. 
+According to McGraw and Wong (1996) Convention, ICC (2,1) quantifies the variability 
+between voxels relative to the measurement error and is calculated 
+with a two-way random effects, absolute agreement, single rater/measurement model.
 """
 
 
@@ -33,33 +38,21 @@ from scipy.stats import normaltest
 import seaborn as sns
 import pingouin as pg
 
-# def Normality_test(data):
-#     '''This function runs a normality test on the data provided, according to the Shapiro-Wilk test'''
-#     stat, p = normaltest(data)
-#     print('stat=%.3f, p=%.3f\n' % (stat, p))
-#     if p>0.05:
-#         print('Probably Gaussian')
-#     else:
-#         print('Probably not Gaussian')
-    
-    
     
 #%% Set Working directory
         
-data_supradir = '/home/caterina/Documents/Data/new_data/' #Set working directory
+data_supradir = 'Path to data directory' #Set working directory
 
-tp1_dir = data_supradir+'Timepoint1/'
-tp2_dir = data_supradir+'Timepoint2/'
+tp1_dir = data_supradir+'Timepoint1/' #Set path to directory containing images from Timepoint 1
+tp2_dir = data_supradir+'Timepoint2/' #Set path to directory containing images from Timepoint 2
 
-# os.mkdir(data_supradir + 'ICC analysis at two timepoints/')
-# results_dir = data_supradir + 'ICC analysis at two timepoints/'
+os.mkdir(data_supradir + 'ICC analysis at two timepoints/')
+results_dir = data_supradir + 'ICC analysis at two timepoints/'
 
 subjs_path = [ f.path for f in os.scandir(tp2_dir) if f.is_dir() ] #Create a list of the paths to the subjects directories
 subjs_name = [ f.name for f in os.scandir(tp2_dir) if f.is_dir() ] #Create a list of subjects names
-# subjs_name.remove('Visualization Results Images')
 
 n_subj = len(subjs_name) #Total number of subjects
-
 
 Results_ICC = {'ADC': pd.DataFrame(columns=['Subject_ID','Type', 'Description','ICC', 'F', 'df1', 'df2', 'pval', 'CI95%']), 'rBV': pd.DataFrame(columns=['Subject_ID','Type', 'Description','ICC', 'F', 'df1', 'df2', 'pval', 'CI95%']), 'rBF': pd.DataFrame(columns=['Subject_ID','Type', 'Description','ICC', 'F', 'df1', 'df2', 'pval', 'CI95%']), 'ADC-rBV TP': pd.DataFrame(columns=['Subject_ID','Type', 'Description','ICC', 'F', 'df1', 'df2', 'pval', 'CI95%']), 'ADC-rBF TP': pd.DataFrame(columns=['Subject_ID','Type', 'Description','ICC', 'F', 'df1', 'df2', 'pval', 'CI95%']), 'ADC-rBV DP': pd.DataFrame(columns=['Subject_ID','Type', 'Description','ICC', 'F', 'df1', 'df2', 'pval', 'CI95%']), 'ADC-rBF DP': pd.DataFrame(columns=['Subject_ID','Type', 'Description','ICC', 'F', 'df1', 'df2', 'pval', 'CI95%'])}
 IntraWriter = pd.ExcelWriter(data_supradir +'ICCResults.xlsx', engine='xlsxwriter')
