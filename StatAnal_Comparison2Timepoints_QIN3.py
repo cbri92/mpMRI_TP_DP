@@ -2,7 +2,13 @@
 """
 Created on Mon Jan 11 14:52:43 2021
 
-@author: cbri3325
+@author: Caterina Brighi
+
+This script calculates different repeatability metrics, including the following:
+Voxel-wise statistics: 'Mean intensity in ROI at tp1', 'Mean intensity in ROI at tp2', 'Between voxels variance', 'Within voxels variance', 'ROI ICC', 'Within voxel CoV', 'Repeatability coefficient', 'RC Upper', 'RC Lower'.
+ROI-wise statistics: 'WMS', 'BMS','wSD', 'bSD', 'tSD', 'RC', 'RC Upper', 'RC Lower', 'wCV', 'ICC'
+It also plots scatter density histograms of the voxels intensity distribution within a ROI,
+Bolt Altman plots and intensity correlation plotsbetween two timepoints, both for voxel-wise analysis and ROI-wise analysis.
 """
 
 
@@ -32,23 +38,13 @@ from ImageStatisticsFunctions import *
 from scipy.stats import normaltest
 import seaborn as sns
 
-# def Normality_test(data):
-#     '''This function runs a normality test on the data provided, according to the Shapiro-Wilk test'''
-#     stat, p = normaltest(data)
-#     print('stat=%.3f, p=%.3f\n' % (stat, p))
-#     if p>0.05:
-#         print('Probably Gaussian')
-#     else:
-#         print('Probably not Gaussian')
-    
-    
-    
+
 #%% Set Working directory
         
-data_supradir = 'C:/Users/cbri3325/Dropbox (Sydney Uni)/Caterina Brighi/Data/QIN/Analysed/' #Set working directory
+data_supradir = 'Path to data directory' #Set working directory
 
-tp1_dir = data_supradir+'Timepoint1/Res1.2iso_smooth_3D_CTRL_VOI_CSF/'
-tp2_dir = data_supradir+'Timepoint2sameCSFasTp1/'
+tp1_dir = data_supradir+'Timepoint1/' #Set path to directory containing images from Timepoint 1
+tp2_dir = data_supradir+'Timepoint2/' #Set path to directory containing images from Timepoint 2
 
 os.mkdir(data_supradir + 'Intensity comparison at two timepoints_new/')
 results_dir = data_supradir + 'Intensity comparison at two timepoints_new/'
@@ -204,16 +200,6 @@ for current in subjs_name:
     plt.close()
     
 #%% Calculate ROI-based group repeatibility statistics
-
-    #Check if data are normally distributed with Shapiro-Wilk test
-    # Normality_test(ADC_rBF_DPBN2_vxls)
-    # ax = sns.distplot(ADC_rBF_DPBN2_vxls)
-
-    # #Take log of TP to ensure normality
-    # ADC_rBV_TP1_vxls = np.log(ADC_rBV_TP1_vxls)
-    # ADC_rBV_TP2_vxls = np.log(ADC_rBV_TP2_vxls)
-    # ADC_rBF_TP1_vxls = np.log(ADC_rBF_TP1_vxls)
-    # ADC_rBF_TP2_vxls = np.log(ADC_rBF_TP2_vxls)
 
     #Calculate ICC within ROI
 
