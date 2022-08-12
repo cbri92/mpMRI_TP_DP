@@ -5,8 +5,8 @@ Created on Mon Jan 11 14:52:43 2021
 @author: Caterina Brighi
 
 This script calculates different repeatability metrics, including the following:
-Voxel-wise statistics: 'Mean intensity in ROI at tp1', 'Mean intensity in ROI at tp2', 'Between voxels variance', 'Within voxels variance', 'ROI ICC', 'Within voxel CoV', 'Repeatability coefficient', 'RC Upper', 'RC Lower'.
-ROI-wise statistics: 'WMS', 'BMS','wSD', 'bSD', 'tSD', 'RC', 'RC Upper', 'RC Lower', 'wCV', 'ICC'
+Voxel-wise statistics: 'Mean intensity in ROI at tp1', 'Mean intensity in ROI at tp2', 'Between voxels variance', 'Within voxels variance', 'ROI ICC (2,1)', 'Within voxel CoV', 'Repeatability coefficient', 'RC Upper', 'RC Lower'.
+ROI-wise statistics: 'WMS', 'BMS','wSD', 'bSD', 'tSD', 'RC', 'RC Upper', 'RC Lower', 'wCV', 'ICC (2,1)'
 It also plots scatter density histograms of the voxels intensity distribution within a ROI,
 Bolt Altman plots and intensity correlation plotsbetween two timepoints, both for voxel-wise analysis and ROI-wise analysis.
 """
